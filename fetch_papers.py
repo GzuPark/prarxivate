@@ -18,6 +18,7 @@ def get_args():
     parser.add_argument('-pi', '--results-per-iteration', type=int, default=100, help='passed to arXiv API')
     parser.add_argument('--wait-time', type=float, default=5.0, help='lets be gentle to arXiv API (seconds)')
     parser.add_argument('-break', '--break-on-no-added', type=int, default=1, help='break out early in db: 1=yes, 0=no')
+    parser.add_argument('-id', '--id-list', type=str, default='none', help='add one paper based on arXiv ID')
     args = parser.parse_args()
     
     args.db_path = Config.db_path
@@ -61,15 +62,18 @@ def fetch(args):
     base_url = 'http://export.arxiv.org/api/query?'
 
     db = pickle_load(args.db_path)
-    print("database has {} entries at start".format(len(db)))
+    print('database has {} entries at start'.format(len(db)))
 
     assert args.max_index - args.start_index > 0, 'error index range from {f} to {t}'.format(f=args.start_index, t=args.max_index)
     num_iter = min(args.max_index - args.start_index, args.results_per_iteration)
     num_added_total = 0
 
     for i in range(args.start_index, args.max_index, args.results_per_iteration):
-        print("Result {} - {}".format(i, i+num_iter))
-        query = 'search_query={q}&sortBy=submittedDate&start={s}&max_results={m}'.format(q=args.search_query, s=i, m=num_iter)
+        if args.id_list == 'none':
+            print('Result {} - {}'.format(i, i+num_iter))
+            query = 'search_query={q}&sortBy=submittedDate&start={s}&max_results={m}'.format(q=args.search_query, s=i, m=num_iter)
+        else:
+            query = 'id_list={}'.format(args.id_list)
 
         with urllib.request.urlopen(base_url + query) as url:
             resp = url.read()
@@ -89,7 +93,7 @@ def fetch(args):
                 num_added += 1
                 num_added_total += 1
 
-        if len(parse.entries) == 0:
+        if (len(parse.entries) == 0):
             print('Received no results from arXiv.')
             print(resp)
             break
@@ -97,7 +101,7 @@ def fetch(args):
         if num_added == 0:
             print('No more new papers.')
 
-        if args.break_on_no_added == 0:
+        if (args.break_on_no_added == 0) or (args.id_list != 'none'):
             break
 
         print('Sleeping for {} seconds'.format(args.wait_time))

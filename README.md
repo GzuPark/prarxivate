@@ -20,6 +20,7 @@ pip install -r requirements.txt
 usage: fetch_papers.py [-h] [-sq SEARCH_QUERY] [-si START_INDEX]
                        [-mi MAX_INDEX] [-pi RESULTS_PER_ITERATION]
                        [--wait-time WAIT_TIME] [-break BREAK_ON_NO_ADDED]
+                       [-id ID_LIST]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -37,6 +38,8 @@ optional arguments:
                         lets be gentle to arXiv API (seconds)
   -break BREAK_ON_NO_ADDED, --break-on-no-added BREAK_ON_NO_ADDED
                         break out early in db: 1=yes, 0=no
+  -id ID_LIST, --id-list ID_LIST
+                        add one paper based on arXiv ID
 ```
 
 #### Example (Fetch)
@@ -47,6 +50,9 @@ optional arguments:
   - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:stat.ML+OR+cat:cs.RO`
   - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML`
   - `cat:cs.CV+AND+cat:cs.LG`
+- `--id-list`
+  - `1406.2661`
+  - `1703.10593`
 
 ### HTML
 
