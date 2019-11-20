@@ -268,3 +268,8 @@ dmypy.json
 # private
 results/*
 !results/.gitkeep
+data/*
+!data/.gitkeep
+
+# for developing
+*.ipynb
