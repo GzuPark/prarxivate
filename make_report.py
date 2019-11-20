@@ -7,6 +7,7 @@ from utils import Config, pickle_load, strip_version
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--report-date', type=str, default='2019-11-15', help='specific date for report (html)')
+    parser.add_argument('-c', '--filter-primary-category', type=str, default='none', help='specific primary category if want to choice multiple category use "+"')
     parser.add_argument('-nbc', '--number-break-contents', type=int, default=25, help='number of break point for contents')
     parser.add_argument('-nbs', '--number-break-summary', type=int, default=3, help='number of break point for summary')
     args = parser.parse_args()
@@ -19,6 +20,16 @@ def get_args():
 def find_papers(args):
     y, m, d = args.report_date.split('-')
     y = int(y); m = int(m); d = int(d)
+
+    if 'none' in args.filter_primary_category:
+        pcates = ['cs.CV', 'cs.AI', 'cs.LG', 'stat.ML', 'cs.RO']
+    elif '+' in args.filter_primary_category:
+        pcates = args.filter_primary_category.replace(' ', '').split('+')
+    else:
+        pcates = [args.filter_primary_category]
+    print(pcates)
+    assert type(pcates) == list, 'typeError: primary category list'
+
     db = pickle_load(args.db_path)
     print('database has {} entries'.format(len(db)))
 
@@ -28,7 +39,8 @@ def find_papers(args):
     prev_year = y
     for k, v in db.items():
         if (y == v['published_parsed'].tm_year) and (m == v['published_parsed'].tm_mon) and (d == v['published_parsed'].tm_mday):
-            result[k] = v
+            if v['arxiv_primary_category']['term'] in pcates:
+                result[k] = v
             if (flag == False) and (prev_yday != v['published_parsed'].tm_yday - 1):
                 prev_yday = v['published_parsed'].tm_yday - 1
                 if prev_yday < 0:
@@ -39,7 +51,7 @@ def find_papers(args):
 
     assert flag == True, 'recommend to run fetch_papers.py with large enough --max-index'
     print('found {} entries'.format(len(result)))
-    return result
+    return result, pcates
 
 
 # https://codepen.io/rafaelcastrocouto/pen/LFAes
@@ -74,9 +86,9 @@ def add_css():
     return css
 
 
-def create_html(args, db):
+def create_html(args, db, pcates):
     db_list = list(db.keys())
-    fname = '{}.html'.format(args.report_date)
+    fname = '{d}-{c}.html'.format(d=args.report_date, c='+'.join(pcates))
     path = os.path.join(args.report_path, fname)
     html = open(path, 'w')
     
@@ -137,8 +149,8 @@ def create_html(args, db):
 
 def main():
     args = get_args()
-    db = find_papers(args)
-    create_html(args, db)
+    db, pcates = find_papers(args)
+    create_html(args, db, pcates)
 
     
 if __name__ == '__main__':

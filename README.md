@@ -1,7 +1,9 @@
 # Private arXiv
+
 This is a project for collecting arXiv papers, which I'm interesting, and converting to html files per day.
 
 ## Pre-requsite
+
 - [feedparser](https://pypi.org/project/feedparser/)
 
 ```sh
@@ -9,13 +11,10 @@ pip install -r requirements.txt
 ```
 
 ## How to use
+
+### Fetch
+
 - `fetch_papers.py` will be save papers at data directory
-- example of `--search-query`
-  - [guide](https://arxiv.org/help/api/user-manual#subject_classifications)
-  - `cat:cs.CV`
-  - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:stat.ML+OR+cat:cs.RO`
-  - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML`
-  - `cat:cs.CV+AND+cat:cs.LG`
 
 ```sh
 usage: fetch_papers.py [-h] [-sq SEARCH_QUERY] [-si START_INDEX]
@@ -40,25 +39,47 @@ optional arguments:
                         break out early in db: 1=yes, 0=no
 ```
 
+#### Example (Fetch)
+
+- `--search-query`
+  - [guide](https://arxiv.org/help/api/user-manual#subject_classifications)
+  - `cat:cs.CV`
+  - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:stat.ML+OR+cat:cs.RO`
+  - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML`
+  - `cat:cs.CV+AND+cat:cs.LG`
+
+### HTML
+
 - `make_report.py` will be make the html file at results directory
-- example of `--report-date`
-  - `2019-11-20`
+
 ```sh
-usage: make_report.py [-h] [-d REPORT_DATE] [-nbc NUMBER_BREAK_CONTENTS]
-                      [-nbs NUMBER_BREAK_SUMMARY]
+usage: make_report.py [-h] [-d REPORT_DATE] [-c FILTER_PRIMARY_CATEGORY]
+                      [-nbc NUMBER_BREAK_CONTENTS] [-nbs NUMBER_BREAK_SUMMARY]
 
 optional arguments:
   -h, --help            show this help message and exit
   -d REPORT_DATE, --report-date REPORT_DATE
                         specific date for report (html)
+  -c FILTER_PRIMARY_CATEGORY, --filter-primary-category FILTER_PRIMARY_CATEGORY
+                        specific primary category if want to choice multiple
+                        category use "+"
   -nbc NUMBER_BREAK_CONTENTS, --number-break-contents NUMBER_BREAK_CONTENTS
                         number of break point for contents
   -nbs NUMBER_BREAK_SUMMARY, --number-break-summary NUMBER_BREAK_SUMMARY
                         number of break point for summary
 ```
 
+#### Example (HTML)
+
+- `--report-date`
+  - `2019-11-20`
+- `--filter-primary-category`
+  - `cs.CV`
+  - `cs.CV+cv.RO`
+  - `cs.CV + cv.LG`
 
 ## Reference
+
 - [arXiv api user manual](https://arxiv.org/help/api/user-manual)
 - [arxiv-sanity by karpathy](https://github.com/karpathy/arxiv-sanity-preserver)
 - [A4 CSS page template](https://codepen.io/rafaelcastrocouto/pen/LFAes)
