@@ -1,6 +1,7 @@
 # Private arXiv
+This is a project for collecting arXiv papers, which I'm interesting, and converting to html files per day.
 
-## Set up
+## Pre-requsite
 - [feedparser](https://pypi.org/project/feedparser/)
 
 ```sh
@@ -8,7 +9,14 @@ pip install -r requirements.txt
 ```
 
 ## How to use
-- `fetch_papers.py`
+- `fetch_papers.py` will be save papers at data directory
+- example of `--search-query`
+  - [guide](https://arxiv.org/help/api/user-manual#subject_classifications)
+  - `cat:cs.CV`
+  - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:stat.ML+OR+cat:cs.RO`
+  - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML`
+  - `cat:cs.CV+AND+cat:cs.LG`
+
 ```sh
 usage: fetch_papers.py [-h] [-sq SEARCH_QUERY] [-si START_INDEX]
                        [-mi MAX_INDEX] [-pi RESULTS_PER_ITERATION]
@@ -32,13 +40,25 @@ optional arguments:
                         break out early in db: 1=yes, 0=no
 ```
 
-- example of `--search-query`
-  - [guide](https://arxiv.org/help/api/user-manual#subject_classifications)
-  - `cat:cs.CV`
-  - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:stat.ML+OR+cat:cs.RO`
-  - `cat:cs.CV+OR+cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL+OR+cat:cs.NE+OR+cat:stat.ML`
-  - `cat:cs.CV+AND+cat:cs.LG`
+- `make_report.py` will be make the html file at results directory
+- example of `--report-date`
+  - `2019-11-20`
+```sh
+usage: make_report.py [-h] [-d REPORT_DATE] [-nbc NUMBER_BREAK_CONTENTS]
+                      [-nbs NUMBER_BREAK_SUMMARY]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d REPORT_DATE, --report-date REPORT_DATE
+                        specific date for report (html)
+  -nbc NUMBER_BREAK_CONTENTS, --number-break-contents NUMBER_BREAK_CONTENTS
+                        number of break point for contents
+  -nbs NUMBER_BREAK_SUMMARY, --number-break-summary NUMBER_BREAK_SUMMARY
+                        number of break point for summary
+```
+
 
 ## Reference
-- [arxiv api user manual](https://arxiv.org/help/api/user-manual)
+- [arXiv api user manual](https://arxiv.org/help/api/user-manual)
 - [arxiv-sanity by karpathy](https://github.com/karpathy/arxiv-sanity-preserver)
+- [A4 CSS page template](https://codepen.io/rafaelcastrocouto/pen/LFAes)
