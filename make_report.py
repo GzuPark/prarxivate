@@ -27,7 +27,6 @@ def find_papers(args):
         pcates = args.filter_primary_category.replace(' ', '').split('+')
     else:
         pcates = [args.filter_primary_category]
-    print(pcates)
     assert type(pcates) == list, 'typeError: primary category list'
 
     db = pickle_load(args.db_path)
