@@ -96,12 +96,15 @@ def fetch(args):
         if (len(parse.entries) == 0):
             print('Received no results from arXiv.')
             print(resp)
-            break
+            if args.break_on_no_added == 0:
+                pass
+            else:
+                break
 
         if num_added == 0:
             print('No more new papers.')
 
-        if (args.break_on_no_added == 0) or (args.id_list != 'none'):
+        if  args.id_list != 'none':
             break
 
         print('Sleeping for {} seconds'.format(args.wait_time))
