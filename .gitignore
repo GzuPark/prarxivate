@@ -270,6 +270,7 @@ results/*
 !results/.gitkeep
 data/*
 !data/.gitkeep
+automation.py
 
 # for developing
 *.ipynb
