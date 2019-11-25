@@ -66,7 +66,7 @@ usage: make_report.py [-h] [-d REPORT_DATE] [-c FILTER_PRIMARY_CATEGORY]
 optional arguments:
   -h, --help            show this help message and exit
   -d REPORT_DATE, --report-date REPORT_DATE
-                        specific date for report (html)
+                        specific date for report (html), if multiple date: "FROM_DATE TO_DATE"
   -c FILTER_PRIMARY_CATEGORY, --filter-primary-category FILTER_PRIMARY_CATEGORY
                         specific primary category if want to choice multiple category use "+"
   -nbc NUMBER_BREAK_CONTENTS, --number-break-contents NUMBER_BREAK_CONTENTS

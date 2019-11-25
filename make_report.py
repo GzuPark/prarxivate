@@ -1,12 +1,16 @@
 import argparse
+import copy
 import os
+
+from datetime import datetime, timedelta
 
 from utils import Config, pickle_load, strip_version
 
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--report-date', type=str, default='2019-11-15', help='specific date for report (html)')
+    now = datetime.now().strftime('%Y-%m-%d')
+    parser.add_argument('-d', '--report-date', type=str, default='{}'.format(now), help='specific date for report (html), if multiple date: "FROM_DATE TO_DATE"')
     parser.add_argument('-c', '--filter-primary-category', type=str, default='none', help='specific primary category if want to choice multiple category use "+"')
     parser.add_argument('-nbc', '--number-break-contents', type=int, default=25, help='number of break point for contents')
     parser.add_argument('-nbs', '--number-break-summary', type=int, default=2, help='number of break point for summary')
@@ -107,7 +111,7 @@ def add_css():
 def create_html(args, db, pcates):
     db_list = list(db.keys())
     sort_by = date_sort_by(args.date_sort_by).split('_')[0]
-    fname = '{d}-{ds}-{c}.html'.format(d=args.report_date, ds=sort_by, c='+'.join(pcates))
+    fname = '{d}-{ds}-{n}-{c}.html'.format(d=args.report_date, ds=sort_by, n=len(db), c='+'.join(pcates))
     path = os.path.join(args.report_path, fname)
     html = open(path, 'w')
     
@@ -175,12 +179,35 @@ def create_html(args, db, pcates):
 
     html.write('</body></html>')
     html.close()
+    print('saved {}'.format(fname))
+
+
+def make_date_list(report_date):
+    if ' ' in  report_date:
+        from_date, to_date = report_date.split(' ')
+    else:
+        from_date = report_date
+        to_date = report_date
+
+    if from_date < to_date:
+        tmp = copy.deepcopy(from_date)
+        from_date = copy.deepcopy(to_date)
+        to_date = copy.deepcopy(tmp)
+
+    from_date = datetime.strptime(from_date, '%Y-%m-%d')
+    to_date = datetime.strptime(to_date, '%Y-%m-%d')
+    diff_date = (from_date - to_date).days
+    result = [(from_date - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(diff_date + 1)]
+    return result
 
 
 def main():
     args = get_args()
-    db, pcates = find_papers(args)
-    create_html(args, db, pcates)
+    date_list = make_date_list(args.report_date)
+    for d in date_list:
+        args.report_date = d
+        db, pcates = find_papers(args)
+        create_html(args, db, pcates)
 
     
 if __name__ == '__main__':
