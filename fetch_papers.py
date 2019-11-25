@@ -16,6 +16,7 @@ def get_args():
     parser.add_argument('-si', '--start-index', type=int, default=0, help='0 = most recent API result')
     parser.add_argument('-mi', '--max-index', type=int, default=10000, help='upper bound on paper index we will fetch')
     parser.add_argument('-pi', '--results-per-iteration', type=int, default=100, help='passed to arXiv API')
+    parser.add_argument('-ds', '--date-sort-by', type=str, default='u', help='sort by (lastUpdatedDate (u) | submittedDate (s) ), default: u')
     parser.add_argument('--wait-time', type=float, default=5.0, help='lets be gentle to arXiv API (seconds)')
     parser.add_argument('-break', '--break-on-no-added', type=int, default=1, help='break out early in db: 1=yes, 0=no')
     parser.add_argument('-id', '--id-list', type=str, default='none', help='add one paper based on arXiv ID')
@@ -64,6 +65,14 @@ def fetch(args):
     db = pickle_load(args.db_path)
     print('database has {} entries at start'.format(len(db)))
 
+    if args.date_sort_by == 's':
+        sort_by = 'submittedDate'
+    elif args.date_sort_by == 'u':
+        sort_by = 'lastUpdatedDate'
+    else:
+        print('[Warning] --date-sort-by changed to "lastUpdatedDate"')
+        sort_by = 'lastUpdatedDate'
+
     assert args.max_index - args.start_index > 0, 'error index range from {f} to {t}'.format(f=args.start_index, t=args.max_index)
     num_iter = min(args.max_index - args.start_index, args.results_per_iteration)
     num_added_total = 0
@@ -71,7 +80,7 @@ def fetch(args):
     for i in range(args.start_index, args.max_index, args.results_per_iteration):
         if args.id_list == 'none':
             print('Result {} - {}'.format(i, i+num_iter))
-            query = 'search_query={q}&sortBy=submittedDate&start={s}&max_results={m}'.format(q=args.search_query, s=i, m=num_iter)
+            query = 'search_query={q}&sortBy={ds}&start={s}&max_results={m}'.format(q=args.search_query, ds=sort_by, s=i, m=num_iter)
         else:
             query = 'id_list={}'.format(args.id_list)
 
