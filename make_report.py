@@ -9,12 +9,24 @@ def get_args():
     parser.add_argument('-d', '--report-date', type=str, default='2019-11-15', help='specific date for report (html)')
     parser.add_argument('-c', '--filter-primary-category', type=str, default='none', help='specific primary category if want to choice multiple category use "+"')
     parser.add_argument('-nbc', '--number-break-contents', type=int, default=25, help='number of break point for contents')
-    parser.add_argument('-nbs', '--number-break-summary', type=int, default=3, help='number of break point for summary')
+    parser.add_argument('-nbs', '--number-break-summary', type=int, default=2, help='number of break point for summary')
+    parser.add_argument('-ds', '--date-sort-by', type=str, default='p', help='sort by ( published (p) | updated (u) ), default: p')
     args = parser.parse_args()
-    
+
     args.db_path = Config.db_path
     args.report_path = Config.report_path
     return args
+
+
+def date_sort_by(ds):
+    if ds == 'u':
+        sort_by = 'updated_parsed'
+    elif ds == 'p':
+        sort_by = 'published_parsed'
+    else:
+        print('[Warning] --date-sort-by changed to "updated_parsed"')
+        sort_by = 'published_parsed'
+    return sort_by
 
 
 def find_papers(args):
@@ -29,6 +41,8 @@ def find_papers(args):
         pcates = [args.filter_primary_category]
     assert type(pcates) == list, 'typeError: primary category list'
 
+    sort_by = date_sort_by(args.date_sort_by)
+
     db = pickle_load(args.db_path)
     print('database has {} entries'.format(len(db)))
 
@@ -37,18 +51,22 @@ def find_papers(args):
     prev_yday = 999
     prev_year = y
     for k, v in db.items():
-        if (y == v['published_parsed'].tm_year) and (m == v['published_parsed'].tm_mon) and (d == v['published_parsed'].tm_mday):
+        if (y == v[sort_by].tm_year) and (m == v[sort_by].tm_mon) and (d == v[sort_by].tm_mday):
             if v['arxiv_primary_category']['term'] in pcates:
                 result[k] = v
-            if (flag == False) and (prev_yday != v['published_parsed'].tm_yday - 1):
-                prev_yday = v['published_parsed'].tm_yday - 1
+            if (flag == False) and (prev_yday != v[sort_by].tm_yday - 1):
+                prev_yday = v[sort_by].tm_yday - 1
                 if prev_yday < 0:
                     prev_yday = 365
-                    prev_year = v['published_parsed'].tm_year - 1
-        if (prev_year ==  v['published_parsed'].tm_year) and (prev_yday == v['published_parsed'].tm_yday):
+                    prev_year = v[sort_by].tm_year - 1
+        if (prev_year ==  v[sort_by].tm_year) and (prev_yday == v[sort_by].tm_yday):
             flag = True
 
-    assert flag == True, 'recommend to run fetch_papers.py with large enough --max-index'
+    if flag == True:
+        pass
+    elif flag == False:
+        print('recommend to run fetch_papers.py with large enough --max-index')
+        exit(0)
     print('found {} entries'.format(len(result)))
     return result, pcates
 
@@ -87,12 +105,13 @@ def add_css():
 
 def create_html(args, db, pcates):
     db_list = list(db.keys())
-    fname = '{d}-{c}.html'.format(d=args.report_date, c='+'.join(pcates))
+    sort_by = date_sort_by(args.date_sort_by).split('_')[0]
+    fname = '{d}-{ds}-{c}.html'.format(d=args.report_date, ds=sort_by, c='+'.join(pcates))
     path = os.path.join(args.report_path, fname)
     html = open(path, 'w')
     
     html.write('<html><head>')
-    html.write('<title>Report arXiv {}</title>'.format(args.report_date))
+    html.write('<title>arXiv {ds} {d}</title>'.format(ds=sort_by, d=args.report_date))
     html.write('<style type="text/css">')
     css = add_css()
     html.write(css)
@@ -102,7 +121,7 @@ def create_html(args, db, pcates):
     # make contents list
     for i, e in enumerate(db_list):
         if i % args.number_break_contents == 0:
-            html.write('<page size="A4"><center><h1>Report arXiv {}</h1>'.format(args.report_date))
+            html.write('<page size="A4"><center><h1>Report arXiv {ds} {d}</h1>'.format(ds=sort_by, d=args.report_date))
             html.write('<table width="750px">')
             html.write('<tr><th>N</th><th>ID</th><th>Title</th><th>P.C.</th></tr>')
         html.write('<tr><td>{}</td>'.format(i+1))
