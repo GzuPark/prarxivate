@@ -61,7 +61,7 @@ optional arguments:
 ```sh
 usage: make_report.py [-h] [-d REPORT_DATE] [-c FILTER_PRIMARY_CATEGORY]
                       [-nbc NUMBER_BREAK_CONTENTS] [-nbs NUMBER_BREAK_SUMMARY]
-                      [-ds DATE_SORT_BY]
+                      [-ds DATE_SORT_BY] [-pf PRINTABLE_FORMAT_A4]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -75,6 +75,8 @@ optional arguments:
                         number of break point for summary
   -ds DATE_SORT_BY, --date-sort-by DATE_SORT_BY
                         sort by ( published (p) | updated (u) ), default: p
+  -pf PRINTABLE_FORMAT_A4, --printable-format-a4 PRINTABLE_FORMAT_A4
+                        printable format A4: 1=yes, 0=no
 ```
 
 #### Example (HTML)

@@ -11,6 +11,7 @@ def get_args():
     parser.add_argument('-nbc', '--number-break-contents', type=int, default=25, help='number of break point for contents')
     parser.add_argument('-nbs', '--number-break-summary', type=int, default=2, help='number of break point for summary')
     parser.add_argument('-ds', '--date-sort-by', type=str, default='p', help='sort by ( published (p) | updated (u) ), default: p')
+    parser.add_argument('-pf', '--printable-format-a4', type=int, default='1', help='printable format A4: 1=yes, 0=no')
     args = parser.parse_args()
 
     args.db_path = Config.db_path
@@ -120,23 +121,32 @@ def create_html(args, db, pcates):
 
     # make contents list
     for i, e in enumerate(db_list):
-        if i % args.number_break_contents == 0:
+        if (i % args.number_break_contents == 0) and (args.printable_format_a4 == 1):
             html.write('<page size="A4"><center><h1>Report arXiv {ds} {d}</h1>'.format(ds=sort_by, d=args.report_date))
+            html.write('<table width="750px">')
+            html.write('<tr><th>N</th><th>ID</th><th>Title</th><th>P.C.</th></tr>')
+        elif  (i == 0) and (args.printable_format_a4 == 0):
+            html.write('<page><center><h1>Report arXiv {ds} {d}</h1>'.format(ds=sort_by, d=args.report_date))
             html.write('<table width="750px">')
             html.write('<tr><th>N</th><th>ID</th><th>Title</th><th>P.C.</th></tr>')
         html.write('<tr><td>{}</td>'.format(i+1))
         html.write('<td align="center"><a href="{link}">{id}</a></td>'.format(link=strip_version(db[e]['id']), id=e))
         html.write('<td><a href="#{aid}">{t}</a></td>'.format(aid=e, t=db[e]['title']))
         html.write('<td>{}</td></tr>'.format(db[e]['arxiv_primary_category']['term']))
-        if ((i+1) % args.number_break_contents == 0) or (i == len(db_list) - 1):
+        if (((i+1) % args.number_break_contents == 0) or (i == len(db_list) - 1)) and (args.printable_format_a4 == 1):
+            html.write('</table>')
+            html.write('</center></page>')
+        elif (i == len(db_list) - 1) and (args.printable_format_a4 == 0):
             html.write('</table>')
             html.write('</center></page>')
 
     # make summary details
     for i, e in enumerate(db_list):
-        if i % args.number_break_summary == 0:
+        if (i % args.number_break_summary == 0) and (args.printable_format_a4 == 1):
             _end = (i + args.number_break_summary) if len(db_list) > (i + args.number_break_summary) else len(db_list)
             html.write('<page size="A4"><center><h3>Papers {s} - {e}</h3>'.format(s=i+1, e=_end))
+        elif (i == 0) and (args.printable_format_a4 == 0):
+            html.write('<page><center><h3>Papers {s} - {e}</h3>'.format(s=i+1, e=len(db_list)))
         html.write('<p><table width="750px">')
         # Number, ID, Tags
         html.write('<tr><td style="padding: 0; border: none;"><table style="border: none;" width="750px">')
@@ -158,7 +168,9 @@ def create_html(args, db, pcates):
         # Summary
         html.write('<tr><td>{}</td></tr>'.format(db[e]['summary']))
         html.write('</table></p>')
-        if ((i+1) % args.number_break_summary == 0) or (i == len(db_list)):
+        if (((i+1) % args.number_break_summary == 0) or (i == len(db_list))) and (args.printable_format_a4 == 1):
+            html.write('</center></page>')
+        elif (i == len(db_list)) and (args.printable_format_a4 == 0):
             html.write('</center></page>')
 
     html.write('</body></html>')
