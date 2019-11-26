@@ -51,27 +51,11 @@ def find_papers(args):
     db = pickle_load(args.db_path)
     print('database has {} entries'.format(len(db)))
 
-    flag = False
     result = {}
-    prev_yday = 999
-    prev_year = y
     for k, v in db.items():
         if (y == v[sort_by].tm_year) and (m == v[sort_by].tm_mon) and (d == v[sort_by].tm_mday):
             if v['arxiv_primary_category']['term'] in pcates:
                 result[k] = v
-            if (flag == False) and (prev_yday != v[sort_by].tm_yday - 1):
-                prev_yday = v[sort_by].tm_yday - 1
-                if prev_yday < 0:
-                    prev_yday = 365
-                    prev_year = v[sort_by].tm_year - 1
-        if (prev_year ==  v[sort_by].tm_year) and (prev_yday == v[sort_by].tm_yday):
-            flag = True
-
-    if flag == True:
-        pass
-    elif flag == False:
-        print('recommend to run fetch_papers.py with large enough --max-index')
-        exit(0)
     print('found {} entries'.format(len(result)))
     return result, pcates
 
@@ -207,7 +191,10 @@ def main():
     for d in date_list:
         args.report_date = d
         db, pcates = find_papers(args)
-        create_html(args, db, pcates)
+        if len(db) == 0:
+            print('recommend to run fetch_papers.py with large enough --max-index {}'.format(d))
+        else:
+            create_html(args, db, pcates)
 
     
 if __name__ == '__main__':
