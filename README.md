@@ -4,6 +4,7 @@ This is a project for collecting arXiv papers, which I'm interesting, and conver
 
 ## Pre-requsite
 
+- Python >= 3.6
 - [feedparser](https://pypi.org/project/feedparser/)
 
 ```sh
@@ -87,6 +88,10 @@ optional arguments:
   - `cs.CV`
   - `cs.CV+cv.RO`
   - `cs.CV + cv.LG`
+
+## Issues
+
+- [Archived issues](./archived-issues.md)
 
 ## Reference
 
