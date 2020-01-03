@@ -86,8 +86,8 @@ optional arguments:
   - `2019-11-20`
 - `--filter-primary-category`
   - `cs.CV`
-  - `cs.CV+cv.RO`
-  - `cs.CV + cv.LG`
+  - `cs.CV+cs.RO`
+  - `cs.CV + cs.LG`
 
 ## Issues
 
